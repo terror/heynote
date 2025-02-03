@@ -43,6 +43,11 @@ export function getActiveNoteBlock(state) {
     return state.facet(blockState).find(block => block.range.from <= range.head && block.range.to >= range.head)
 }
 
+export function getActiveNoteBlockFromPosition(state, position) {
+    console.log(state.facet(blockState));
+    return state.facet(blockState).find(block => block.range.from <= position && block.range.to >= position)
+}
+
 export function getFirstNoteBlock(state) {
     return state.facet(blockState)[0]
 }

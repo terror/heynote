@@ -351,6 +351,8 @@ export const deleteBlock = (editor) => ({state, dispatch}) => {
         newSelection = block.delimiter.from + (nextBlock.delimiter.to - nextBlock.delimiter.from)
     }
 
+    console.log('replace', replace);
+
     dispatch(state.update({
         changes: {
             from: block.range.from,
@@ -360,6 +362,67 @@ export const deleteBlock = (editor) => ({state, dispatch}) => {
         selection: EditorSelection.cursor(newSelection),
         annotations: [heynoteEvent.of(DELETE_BLOCK)],
     }))
+}
+
+export const deleteBlockPreserveCursor = (editor) => ({state, dispatch}) => {
+    const range = state.selection.asSingle().ranges[0]
+    const blocks = state.facet(blockState)
+    let block
+    let nextBlock
+    for (let i = 0; i < blocks.length; i++) {
+        block = blocks[i]
+        if (block.range.from <= range.head && block.range.to >= range.head) {
+            if (i < blocks.length - 1) {
+                nextBlock = blocks[i + 1]
+            }
+            break
+        }
+    }
+    
+    let replace = ""
+    let newSelection = range.head // Keep original cursor position
+
+    if (blocks.length == 1) {
+        replace = getBlockDelimiter(editor.defaultBlockToken, editor.defaultBlockAutoDetect)
+    }
+
+    dispatch(state.update({
+        changes: {
+            from: block.range.from,
+            to: block.range.to,
+            insert: replace,
+        },
+        selection: EditorSelection.cursor(newSelection),
+        annotations: [heynoteEvent.of(DELETE_BLOCK)],
+    }))
+}
+
+export function vimKeymap(editor) {
+    Vim.defineOperator("delete", function(cm, _operatorArgs, ranges, _oldAnchor, _newHead) {
+        const view = cm.cm6;
+        const state = view.viewState.state;
+        const line = state.doc.line(ranges[0].anchor.line);
+        const block = getActiveNoteBlockFromPosition(state, line.from);
+        const blockContent = state.doc.sliceString(block.content.from, block.content.to);
+
+        if (!blockContent.includes("\n")) {
+            const transaction = state.update({
+                selection: EditorSelection.cursor(block.content.from)
+            });
+            view.dispatch(transaction);
+            
+            return deleteBlockPreserveCursor(editor)(view);
+        }
+        
+        return deleteLine(view);
+    });
+
+    defaultKeymap.unshift(
+        { keys: "d", type: "operator", operator: "delete", context: "normal" },
+        { keys: "d", type: "operator", operator: "delete", context: "visual" }
+    );
+
+    return [heynoteKeymap(editor), vim()];
 }
 
 export const deleteBlockSetCursorPreviousBlock = (editor) => ({state, dispatch}) => {

@@ -5,6 +5,8 @@ import { markdown } from "@codemirror/lang-markdown"
 import { closeBrackets } from "@codemirror/autocomplete";
 import { undo, redo } from "@codemirror/commands"
 
+import { Vim, vim } from "@replit/codemirror-vim"
+
 import { heynoteLight } from "./theme/light.js"
 import { heynoteDark } from "./theme/dark.js"
 import { heynoteBase } from "./theme/base.js"
@@ -16,6 +18,7 @@ import { heynoteEvent, SET_CONTENT, DELETE_BLOCK, APPEND_BLOCK } from "./annotat
 import { changeCurrentBlockLanguage, triggerCurrenciesLoaded, getBlockDelimiter, deleteBlock, selectAll } from "./block/commands.js"
 import { formatBlockContent } from "./block/format-code.js"
 import { heynoteKeymap } from "./keymap.js"
+import { vimKeymap } from "./keymap.js"
 import { emacsKeymap } from "./emacs.js"
 import { heynoteCopyCut } from "./copy-paste"
 import { languageDetection } from "./language-detection/autodetect.js"
@@ -31,6 +34,8 @@ import { useErrorStore } from "../stores/error-store.js";
 function getKeymapExtensions(editor, keymap) {
     if (keymap === "emacs") {
         return emacsKeymap(editor)
+    } else if (keymap === "vim") {
+        return vimKeymap(editor)
     } else {
         return heynoteKeymap(editor)
     }
@@ -114,6 +119,8 @@ export class HeynoteEditor {
                 links,
             ],
         })
+
+        Vim.unmap("dd", "normal");
 
         // make sure saveFunction is called when page is unloaded
         window.addEventListener("beforeunload", () => {
