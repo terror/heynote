@@ -351,8 +351,6 @@ export const deleteBlock = (editor) => ({state, dispatch}) => {
         newSelection = block.delimiter.from + (nextBlock.delimiter.to - nextBlock.delimiter.from)
     }
 
-    console.log('replace', replace);
-
     dispatch(state.update({
         changes: {
             from: block.range.from,
