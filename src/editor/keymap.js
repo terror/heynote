@@ -77,64 +77,10 @@ export function heynoteKeymap(editor) {
     ])
 }
 
-
-// export function vimKeymap(editor) {
-//     Vim.defineOperator("delete", function(cm, _operatorArgs, ranges, _oldAnchor, _newHead) {
-//         const view = cm.cm6;
-//         const state = view.viewState.state;
-
-//         // This is the line we're on when the operator is invoked
-//         const line = ranges[0].anchor.line;
-
-//         // We want to find the block that contains the line we're on
-//         // 
-//         // A block has a range its in (start, end)
-//         const textLines = state.doc.text; // return ["", "delimiter", "block content", "delmiter", "block content"]
-
-//         // // All text lines
-//         // const lines = state.doc.text;
-
-//         // /*
-//         // * line 1: x chars
-//         // */
-
-//         // console.log(state)
-
-//         // console.log(ranges);
-
-//         // const block = getActiveNoteBlockFromPosition(state, ranges[0].anchor.line - 1 + ranges[0].head.ch);
-//         // const blockText = state.doc.sliceString(block.content.from, block.content.to);
-
-//         // console.log('block text', blockText);
-
-//         // if (!blockText.includes("\n")) {
-//         //   return deleteBlock(state)(view);
-//         // }
-
-//         // deleteLine(view);
-//     });
-
-//     defaultKeymap.unshift(
-//         { keys: "d", type: "operator", operator: "delete", context: "normal" },
-//         { keys: "d", type: "operator", operator: "delete", context: "visual" }
-//     );
-
-//     return [heynoteKeymap(editor), vim()];
-// }
-//
 export function vimKeymap(editor) {
     Vim.defineOperator("delete", function(cm, _operatorArgs, ranges, _oldAnchor, _newHead) {
         const view = cm.cm6;
         const state = view.viewState.state;
-
-        // cases: need to handle
-        // d*, d <motion>
-        // - if motion selects everything - delete the entire block
-        // - normal mode `dd` (easiest case, done - just call delete block if '\n' isn't present)
-        // - visual mode (selection ranges)
-        // c*, c <motion>
-        // normal mode - we don't do anything here
-        // very similar to d* visual mode case
 
         const line = state.doc.line(ranges[0].anchor.line);
 

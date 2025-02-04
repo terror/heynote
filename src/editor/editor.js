@@ -120,8 +120,6 @@ export class HeynoteEditor {
             ],
         })
 
-        Vim.unmap("dd", "normal");
-
         // make sure saveFunction is called when page is unloaded
         window.addEventListener("beforeunload", () => {
             this.save()
